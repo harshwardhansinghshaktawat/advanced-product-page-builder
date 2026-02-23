@@ -72,6 +72,7 @@ class ProductSEODashboard extends HTMLElement {
                     --success: #10b981;
                     --warning: #f59e0b;
                     --error: #ef4444;
+                    --purple: #9333ea;
                     --bg-primary: #ffffff;
                     --bg-secondary: #f9fafb;
                     --bg-tertiary: #f3f4f6;
@@ -288,6 +289,7 @@ class ProductSEODashboard extends HTMLElement {
                     font-family: inherit;
                     text-align: center;
                     white-space: nowrap;
+                    text-decoration: none;
                 }
                 
                 .btn:hover {
@@ -319,10 +321,24 @@ class ProductSEODashboard extends HTMLElement {
                     color: white;
                 }
                 
+                .btn-purple {
+                    background: var(--purple);
+                    color: white;
+                }
+                
+                .btn-purple:hover {
+                    background: #7e22ce;
+                }
+                
                 .btn-secondary {
                     background: var(--bg-tertiary);
                     color: var(--text-primary);
                     border: 1px solid var(--border);
+                }
+                
+                .btn-small {
+                    padding: 8px 14px;
+                    font-size: 12px;
                 }
                 
                 /* Single Form */
@@ -342,6 +358,12 @@ class ProductSEODashboard extends HTMLElement {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+                }
+                
+                .form-header-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
                 }
                 
                 .form-title {
@@ -746,7 +768,12 @@ class ProductSEODashboard extends HTMLElement {
                         <div id="formView" class="view-container">
                             <div class="seo-form-container">
                                 <div class="form-header">
-                                    <h2 class="form-title" id="formTitle">Product SEO Setup</h2>
+                                    <div class="form-header-left">
+                                        <h2 class="form-title" id="formTitle">Product SEO Setup</h2>
+                                        <button class="btn btn-secondary btn-small" id="fillSampleBtn">
+                                            🧪 Fill Sample Data
+                                        </button>
+                                    </div>
                                     <button class="form-close" id="closeForm">×</button>
                                 </div>
                                 
@@ -805,6 +832,11 @@ class ProductSEODashboard extends HTMLElement {
         
         this._shadow.getElementById('saveBtn').addEventListener('click', () => {
             this._handleSave();
+        });
+        
+        // Sample data button
+        this._shadow.getElementById('fillSampleBtn').addEventListener('click', () => {
+            this._fillSampleData();
         });
     }
     
@@ -876,6 +908,11 @@ class ProductSEODashboard extends HTMLElement {
             
             const hasSEO = !!seoItem;
             
+            // Generate Google Rich Results Test URL
+            const testUrl = hasSEO && seoItem.structuredData 
+                ? `https://search.google.com/test/rich-results?url=${encodeURIComponent(product.productUrl || window.location.href)}`
+                : '';
+            
             card.innerHTML = `
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image">
                 <div class="product-info">
@@ -886,6 +923,9 @@ class ProductSEODashboard extends HTMLElement {
                     <div class="product-price">${product.price}</div>
                     <div class="product-actions">
                         ${hasSEO ? `
+                            <a href="${testUrl}" target="_blank" class="btn btn-purple btn-small" style="margin-bottom: 10px;">
+                                🔍 Test in Google Rich Results
+                            </a>
                             <div class="action-buttons">
                                 <button class="btn btn-warning edit-btn">✏️ Edit SEO</button>
                                 <button class="btn btn-danger delete-btn">🗑️ Delete</button>
@@ -917,7 +957,941 @@ class ProductSEODashboard extends HTMLElement {
         });
     }
     
-    _showForm(product, seoData, isEdit) {
+    _getSampleDataByProductType() {
+        const productName = this._selectedProduct ? this._selectedProduct.name.toLowerCase() : '';
+        
+        // Electronics Sample (Wireless Headphones)
+        if (productName.includes('headphone') || productName.includes('audio') || productName.includes('speaker')) {
+            return this._getElectronicsSample();
+        }
+        
+        // Clothing Sample (T-Shirt)
+        if (productName.includes('shirt') || productName.includes('clothing') || productName.includes('apparel')) {
+            return this._getClothingSample();
+        }
+        
+        // Food/Beverage Sample (Coffee)
+        if (productName.includes('coffee') || productName.includes('tea') || productName.includes('food') || productName.includes('beverage')) {
+            return this._getFoodSample();
+        }
+        
+        // Book Sample
+        if (productName.includes('book') || productName.includes('novel') || productName.includes('guide')) {
+            return this._getBookSample();
+        }
+        
+        // Furniture Sample (Office Chair)
+        if (productName.includes('chair') || productName.includes('furniture') || productName.includes('desk')) {
+            return this._getFurnitureSample();
+        }
+        
+        // Default to electronics
+        return this._getElectronicsSample();
+    }
+    
+    _getElectronicsSample() {
+        return {
+            productName: "SonicWave Pro Wireless Headphones | Premium Noise Cancelling",
+            description: "Experience studio-quality sound with active noise cancellation, 40-hour battery life, and premium comfort. Free shipping on orders over $50. Limited time: Save 20%!",
+            metaKeywords: "wireless headphones, noise cancelling, bluetooth headphones, premium audio, studio quality",
+            canonicalUrl: "https://yourstore.com/products/sonicwave-pro-headphones",
+            robotsContent: "index, follow",
+            
+            sku: "SWP-2024-BLK",
+            mpn: "SONICWAVE-PRO-001",
+            gtin: "0012345678905",
+            brandName: "SonicWave Audio",
+            
+            imageUrls: [
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200",
+                "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1200",
+                "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=1200"
+            ],
+            
+            price: "199.99",
+            priceCurrency: "USD",
+            priceValidUntil: "2026-12-31",
+            offerUrl: "https://yourstore.com/products/sonicwave-pro-headphones",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            strikethroughPrice: "249.99",
+            
+            memberPrice: "179.99",
+            memberProgramName: "SonicWave VIP Club",
+            memberProgramUrl: "https://yourstore.com/vip-membership",
+            memberTierName: "Gold Member",
+            memberPointsEarned: "200",
+            
+            isProductGroup: true,
+            productGroupID: "SONICWAVE-PRO-2024",
+            variesByColor: true,
+            
+            shippingCost: "0",
+            shippingCurrency: "USD",
+            shippingDestination: "US",
+            handlingTimeMin: "1",
+            handlingTimeMax: "2",
+            deliveryTimeMin: "3",
+            deliveryTimeMax: "5",
+            
+            returnDays: "30",
+            returnCountry: "US",
+            returnMethod: "https://schema.org/ReturnByMail",
+            returnFees: "https://schema.org/FreeReturn",
+            customerRemorseReturnFees: "https://schema.org/FreeReturn",
+            itemDefectReturnFees: "https://schema.org/FreeReturn",
+            returnLabelSource: "https://schema.org/ReturnLabelDownloadAndPrint",
+            
+            aggregateRatingValue: "4.8",
+            reviewCount: "347",
+            
+            certificationName: "FCC",
+            certificationIssuer: "Federal Communications Commission",
+            certificationRating: "Approved",
+            certificationId: "FCC-2024-SWP-001",
+            
+            ogTitle: "SonicWave Pro Wireless Headphones - Premium Noise Cancelling",
+            ogDescription: "Experience studio-quality sound with 40-hour battery life. Save 20% now!",
+            ogImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200",
+            
+            reviews: [
+                {
+                    author: "Sarah Johnson",
+                    rating: "5",
+                    title: "Best headphones I've ever owned!",
+                    text: "The sound quality is absolutely incredible. The noise cancellation works perfectly on my daily commute. Battery life is exactly as advertised - I only charge them once a week!",
+                    date: "2026-02-15",
+                    pros: "Amazing sound quality, Excellent battery life, Comfortable for long wear, Great noise cancellation",
+                    cons: "Slightly heavy, Carrying case could be smaller"
+                },
+                {
+                    author: "Michael Chen",
+                    rating: "5",
+                    title: "Worth every penny",
+                    text: "As an audio engineer, I'm very picky about sound quality. These headphones deliver crystal clear audio across all frequencies. The build quality is premium and they feel durable.",
+                    date: "2026-02-10",
+                    pros: "Professional sound quality, Durable construction, Premium materials, Easy Bluetooth pairing",
+                    cons: "Expensive, No wired option included"
+                },
+                {
+                    author: "Emily Rodriguez",
+                    rating: "4",
+                    title: "Great for travel",
+                    text: "I bought these specifically for a long international flight and they were perfect. The noise cancellation blocked out the engine noise completely. Very comfortable even after 10 hours of wear.",
+                    date: "2026-02-08",
+                    pros: "Excellent noise cancellation, Very comfortable, Long battery life, Compact folding design",
+                    cons: "Touch controls take time to learn, Pricey"
+                },
+                {
+                    author: "David Thompson",
+                    rating: "5",
+                    title: "Incredible value with VIP discount",
+                    text: "Got these at the VIP member price and they're an absolute steal. The sound quality rivals headphones twice the price. Highly recommend joining the VIP program if you're buying these.",
+                    date: "2026-01-28",
+                    pros: "Outstanding value for VIP members, Exceptional sound, Great customer service, Fast shipping",
+                    cons: "Regular price is high, Wish they came in more colors"
+                },
+                {
+                    author: "Lisa Wang",
+                    rating: "5",
+                    title: "Perfect for work from home",
+                    text: "I use these for video calls all day and the microphone quality is exceptional. People can hear me clearly even with background noise. The comfort is unmatched for all-day wear.",
+                    date: "2026-01-20",
+                    pros: "Clear microphone, All-day comfort, Excellent for calls, Reliable Bluetooth connection",
+                    cons: "None really"
+                }
+            ],
+            
+            faqs: [
+                {
+                    question: "What is the battery life of the SonicWave Pro headphones?",
+                    answer: "The SonicWave Pro headphones offer up to 40 hours of playtime on a single charge with ANC (Active Noise Cancellation) turned on, and up to 50 hours with ANC off. A quick 10-minute charge provides 5 hours of playback time."
+                },
+                {
+                    question: "Are these headphones compatible with both iPhone and Android?",
+                    answer: "Yes! The SonicWave Pro headphones are compatible with all Bluetooth-enabled devices including iPhone, Android phones, tablets, laptops, and more. They support Bluetooth 5.3 for reliable connectivity up to 33 feet (10 meters)."
+                },
+                {
+                    question: "Can I use these headphones for phone calls?",
+                    answer: "Absolutely! The SonicWave Pro features 4 built-in microphones with advanced noise reduction technology, making them perfect for crystal-clear phone calls and video conferences even in noisy environments."
+                },
+                {
+                    question: "What comes in the box?",
+                    answer: "Your purchase includes: SonicWave Pro Headphones, Premium hard-shell carrying case, USB-C charging cable, 3.5mm audio cable for wired use, airplane adapter, quick start guide, and 2-year warranty card."
+                },
+                {
+                    question: "How does the VIP membership discount work?",
+                    answer: "VIP members save $20 on this product (regular price $199.99, VIP price $179.99) and earn 200 reward points with purchase. Points can be redeemed for future discounts. Join the VIP Club for free at checkout to start saving immediately!"
+                }
+            ],
+            
+            variants: [
+                {
+                    name: "SonicWave Pro - Midnight Black",
+                    sku: "SWP-2024-BLK",
+                    color: "Midnight Black",
+                    material: "Premium Aluminum & Memory Foam",
+                    gtin: "0012345678905",
+                    url: "https://yourstore.com/products/sonicwave-pro?color=black",
+                    price: "199.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200"
+                },
+                {
+                    name: "SonicWave Pro - Arctic Silver",
+                    sku: "SWP-2024-SLV",
+                    color: "Arctic Silver",
+                    material: "Premium Aluminum & Memory Foam",
+                    gtin: "0012345678912",
+                    url: "https://yourstore.com/products/sonicwave-pro?color=silver",
+                    price: "199.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1200"
+                },
+                {
+                    name: "SonicWave Pro - Rose Gold",
+                    sku: "SWP-2024-RSG",
+                    color: "Rose Gold",
+                    material: "Premium Aluminum & Memory Foam",
+                    gtin: "0012345678929",
+                    url: "https://yourstore.com/products/sonicwave-pro?color=rosegold",
+                    price: "199.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=1200"
+                }
+            ],
+            
+            certifications: [
+                {
+                    name: "CE",
+                    issuer: "European Commission",
+                    rating: "Certified",
+                    id: "CE-2024-AUDIO-789"
+                },
+                {
+                    name: "RoHS",
+                    issuer: "European Union",
+                    rating: "Compliant",
+                    id: "ROHS-2024-456"
+                }
+            ],
+            
+            shippingConditions: [
+                {
+                    country: "US",
+                    cost: "0",
+                    currency: "USD",
+                    minOrder: "50",
+                    maxOrder: "",
+                    doesNotShip: false,
+                    description: "Free standard shipping on orders over $50"
+                },
+                {
+                    country: "CA",
+                    cost: "9.99",
+                    currency: "USD",
+                    minOrder: "0",
+                    maxOrder: "99.99",
+                    doesNotShip: false,
+                    description: "Standard shipping to Canada"
+                }
+            ]
+        };
+    }
+    
+    _getClothingSample() {
+        return {
+            productName: "Premium Cotton T-Shirt | Sustainable & Organic",
+            description: "Eco-friendly organic cotton t-shirt. Soft, breathable, and ethically made. Available in 5 colors and all sizes. Free returns within 60 days!",
+            metaKeywords: "organic cotton, sustainable clothing, eco-friendly shirt, ethical fashion",
+            canonicalUrl: "https://yourstore.com/products/premium-cotton-tshirt",
+            robotsContent: "index, follow",
+            
+            sku: "PCT-2024-WHT-M",
+            mpn: "ECO-SHIRT-001",
+            gtin: "0034567890123",
+            brandName: "EcoThreads",
+            
+            imageUrls: [
+                "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200",
+                "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1200",
+                "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200"
+            ],
+            
+            price: "34.99",
+            priceCurrency: "USD",
+            priceValidUntil: "2026-12-31",
+            offerUrl: "https://yourstore.com/products/premium-cotton-tshirt",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            strikethroughPrice: "49.99",
+            
+            memberPrice: "29.99",
+            memberProgramName: "EcoThreads Green Club",
+            memberProgramUrl: "https://yourstore.com/green-membership",
+            memberTierName: "Silver",
+            memberPointsEarned: "35",
+            
+            isProductGroup: true,
+            productGroupID: "ECO-TSHIRT-2024",
+            variesBySize: true,
+            variesByColor: true,
+            
+            shippingCost: "5.99",
+            shippingCurrency: "USD",
+            shippingDestination: "US",
+            handlingTimeMin: "1",
+            handlingTimeMax: "3",
+            deliveryTimeMin: "5",
+            deliveryTimeMax: "7",
+            
+            returnDays: "60",
+            returnCountry: "US",
+            returnMethod: "https://schema.org/ReturnByMail",
+            returnFees: "https://schema.org/FreeReturn",
+            customerRemorseReturnFees: "https://schema.org/FreeReturn",
+            itemDefectReturnFees: "https://schema.org/FreeReturn",
+            returnLabelSource: "https://schema.org/ReturnLabelInBox",
+            
+            aggregateRatingValue: "4.9",
+            reviewCount: "1247",
+            
+            certificationName: "GOTS",
+            certificationIssuer: "Global Organic Textile Standard",
+            certificationRating: "Certified Organic",
+            certificationId: "GOTS-2024-ECO-555",
+            
+            ogTitle: "Premium Organic Cotton T-Shirt - Sustainable Fashion",
+            ogDescription: "Soft, breathable, ethically made. Save 30% today!",
+            ogImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200",
+            
+            reviews: [
+                {
+                    author: "Jessica Martinez",
+                    rating: "5",
+                    title: "Softest shirt ever!",
+                    text: "This is hands down the softest, most comfortable t-shirt I own. The organic cotton feels amazing against my skin. I've already ordered 3 more in different colors!",
+                    date: "2026-02-18",
+                    pros: "Incredibly soft, Perfect fit, Sustainable, Breathable fabric",
+                    cons: "Wish there were more colors"
+                },
+                {
+                    author: "Tom Wilson",
+                    rating: "5",
+                    title: "Finally, a shirt that fits!",
+                    text: "As a tall guy, finding shirts that fit properly is always a challenge. These run true to size and the length is perfect. Quality is outstanding.",
+                    date: "2026-02-14",
+                    pros: "True to size, Great length, Durable, Holds shape after washing",
+                    cons: "None"
+                },
+                {
+                    author: "Rachel Kim",
+                    rating: "5",
+                    title: "Love supporting sustainable brands",
+                    text: "It's rare to find sustainable clothing that's actually affordable and high quality. These shirts check all the boxes. The GOTS certification gives me peace of mind.",
+                    date: "2026-02-10",
+                    pros: "Eco-friendly, Affordable, Certified organic, Well-made",
+                    cons: "Shipping took a bit long"
+                },
+                {
+                    author: "Chris Anderson",
+                    rating: "4",
+                    title: "Great everyday shirt",
+                    text: "I wear this shirt at least twice a week. It's comfortable, looks good, and has held up well through many washes. Highly recommend!",
+                    date: "2026-02-05",
+                    pros: "Comfortable, Versatile, Durable, Great value",
+                    cons: "Wrinkles easily"
+                },
+                {
+                    author: "Maria Santos",
+                    rating: "5",
+                    title: "Perfect basic tee",
+                    text: "This is now my go-to basic t-shirt. The fit is flattering, the fabric is breathable, and I love that it's ethically made. Worth every penny!",
+                    date: "2026-01-30",
+                    pros: "Flattering fit, Breathable, Ethical production, Good price",
+                    cons: "None really"
+                }
+            ],
+            
+            faqs: [
+                {
+                    question: "What sizes do you offer?",
+                    answer: "We offer sizes XS through 3XL. Our shirts run true to size. We recommend checking our detailed size chart for measurements to ensure the perfect fit."
+                },
+                {
+                    question: "Is this really organic cotton?",
+                    answer: "Yes! All our t-shirts are made from 100% GOTS-certified organic cotton. This means the cotton is grown without harmful pesticides or synthetic fertilizers, and the entire production process meets strict environmental and social criteria."
+                },
+                {
+                    question: "How do I care for this shirt?",
+                    answer: "Machine wash cold with like colors, tumble dry low or hang dry. Avoid bleach. Iron on low heat if needed. The organic cotton will actually get softer with each wash!"
+                },
+                {
+                    question: "What's your return policy?",
+                    answer: "We offer a generous 60-day return policy with free return shipping. If you're not completely satisfied, simply use the prepaid return label included in your package. Full refund, no questions asked!"
+                }
+            ],
+            
+            variants: [
+                {
+                    name: "Premium Cotton Tee - White - Small",
+                    sku: "PCT-2024-WHT-S",
+                    size: "Small",
+                    color: "White",
+                    material: "100% Organic Cotton",
+                    gtin: "0034567890123",
+                    url: "https://yourstore.com/products/tshirt?color=white&size=s",
+                    price: "34.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200"
+                },
+                {
+                    name: "Premium Cotton Tee - White - Medium",
+                    sku: "PCT-2024-WHT-M",
+                    size: "Medium",
+                    color: "White",
+                    material: "100% Organic Cotton",
+                    gtin: "0034567890130",
+                    url: "https://yourstore.com/products/tshirt?color=white&size=m",
+                    price: "34.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200"
+                },
+                {
+                    name: "Premium Cotton Tee - Black - Medium",
+                    sku: "PCT-2024-BLK-M",
+                    size: "Medium",
+                    color: "Black",
+                    material: "100% Organic Cotton",
+                    gtin: "0034567890147",
+                    url: "https://yourstore.com/products/tshirt?color=black&size=m",
+                    price: "34.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1200"
+                },
+                {
+                    name: "Premium Cotton Tee - Navy - Large",
+                    sku: "PCT-2024-NVY-L",
+                    size: "Large",
+                    color: "Navy Blue",
+                    material: "100% Organic Cotton",
+                    gtin: "0034567890154",
+                    url: "https://yourstore.com/products/tshirt?color=navy&size=l",
+                    price: "34.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200"
+                }
+            ],
+            
+            certifications: [
+                {
+                    name: "Fair Trade",
+                    issuer: "Fair Trade USA",
+                    rating: "Certified",
+                    id: "FT-2024-ECO-333"
+                },
+                {
+                    name: "OEKO-TEX",
+                    issuer: "OEKO-TEX Association",
+                    rating: "Standard 100",
+                    id: "OEKO-2024-888"
+                }
+            ],
+            
+            shippingConditions: [
+                {
+                    country: "US",
+                    cost: "5.99",
+                    currency: "USD",
+                    minOrder: "0",
+                    maxOrder: "49.99",
+                    doesNotShip: false,
+                    description: "Standard shipping"
+                },
+                {
+                    country: "US",
+                    cost: "0",
+                    currency: "USD",
+                    minOrder: "50",
+                    maxOrder: "",
+                    doesNotShip: false,
+                    description: "Free shipping on orders over $50"
+                }
+            ]
+        };
+    }
+    
+    _getFoodSample() {
+        return {
+            productName: "Artisan Dark Roast Espresso Beans | USDA Organic 1kg",
+            description: "Experience rich notes of dark chocolate and caramel. Freshly roasted, USDA Organic, and perfect for home baristas. Save 15% on your first order!",
+            metaKeywords: "espresso beans, organic coffee, dark roast, whole bean coffee, artisan coffee",
+            canonicalUrl: "https://yourstore.com/products/artisan-dark-roast",
+            robotsContent: "index, follow",
+            
+            sku: "ARO-DK-1KG",
+            mpn: "ART-ES-001",
+            gtin: "0045678901234",
+            brandName: "Aroma Coffee Co.",
+            
+            imageUrls: [
+                "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=1200",
+                "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1200",
+                "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200"
+            ],
+            
+            price: "24.99",
+            priceCurrency: "USD",
+            priceValidUntil: "2026-12-31",
+            offerUrl: "https://yourstore.com/products/artisan-dark-roast",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            strikethroughPrice: "29.99",
+            
+            unitPricingValue: "1000",
+            unitPricingUnit: "GRM",
+            unitPricingBaseValue: "100",
+            unitPricingBaseUnit: "GRM",
+            
+            memberPrice: "21.99",
+            memberProgramName: "Coffee Club Rewards",
+            memberProgramUrl: "https://yourstore.com/coffee-club",
+            memberTierName: "Gold Roaster",
+            memberPointsEarned: "25",
+            
+            isProductGroup: false,
+            
+            shippingCost: "0",
+            shippingCurrency: "USD",
+            shippingDestination: "US",
+            handlingTimeMin: "1",
+            handlingTimeMax: "2",
+            deliveryTimeMin: "2",
+            deliveryTimeMax: "4",
+            
+            returnDays: "30",
+            returnCountry: "US",
+            returnMethod: "https://schema.org/ReturnByMail",
+            returnFees: "https://schema.org/FreeReturn",
+            customerRemorseReturnFees: "https://schema.org/FreeReturn",
+            itemDefectReturnFees: "https://schema.org/FreeReturn",
+            returnLabelSource: "https://schema.org/ReturnLabelDownloadAndPrint",
+            
+            aggregateRatingValue: "4.9",
+            reviewCount: "892",
+            
+            certificationName: "USDA Organic",
+            certificationIssuer: "United States Department of Agriculture",
+            certificationRating: "Certified Organic",
+            certificationId: "USDA-ORG-2024-567",
+            
+            ogTitle: "Artisan Dark Roast Espresso - USDA Organic 1kg",
+            ogDescription: "Rich dark chocolate & caramel notes. Freshly roasted. Save 15%!",
+            ogImage: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=1200",
+            
+            reviews: [
+                {
+                    author: "John Coffee",
+                    rating: "5",
+                    title: "Best espresso I've tried!",
+                    text: "As a former barista, I'm very particular about my coffee. These beans produce a smooth, rich espresso with no bitterness. The chocolate notes are prominent and delicious.",
+                    date: "2026-02-17",
+                    pros: "Rich flavor, Smooth finish, No bitterness, Fresh roast",
+                    cons: "Bags could be resealable"
+                },
+                {
+                    author: "Emma Brewster",
+                    rating: "5",
+                    title: "Perfect for my morning routine",
+                    text: "I've been buying this coffee for 6 months now and it's consistently excellent. The beans are always fresh and the flavor is outstanding. Great value for organic coffee!",
+                    date: "2026-02-12",
+                    pros: "Consistently good, Fresh beans, Great value, Organic certified",
+                    cons: "None"
+                },
+                {
+                    author: "Mike Espresso",
+                    rating: "5",
+                    title: "Coffee club member for life",
+                    text: "The Coffee Club discount makes these beans even more affordable. At the member price, this is the best value for premium organic espresso. Highly recommend joining!",
+                    date: "2026-02-08",
+                    pros: "Excellent member pricing, Premium quality, Fast shipping, Organic",
+                    cons: "Regular price is a bit high"
+                },
+                {
+                    author: "Sarah Latte",
+                    rating: "4",
+                    title: "Great for lattes",
+                    text: "These beans work perfectly in my home espresso machine. They create a nice crema and the flavor holds up well with milk. Would recommend for latte lovers!",
+                    date: "2026-02-03",
+                    pros: "Good crema, Works well with milk, Fresh roast, Organic",
+                    cons: "Could be a bit stronger"
+                }
+            ],
+            
+            faqs: [
+                {
+                    question: "When are the beans roasted?",
+                    answer: "We roast our beans fresh to order! Your beans are roasted within 48 hours of shipping to ensure maximum freshness and flavor. The roast date is printed on every bag."
+                },
+                {
+                    question: "Are these beans suitable for drip coffee makers?",
+                    answer: "While these beans are optimized for espresso, they also work wonderfully in drip coffee makers, French press, and pour-over methods. The dark roast provides a bold, rich flavor regardless of brewing method."
+                },
+                {
+                    question: "What's the best way to store these beans?",
+                    answer: "Store in an airtight container in a cool, dark place. Avoid refrigeration as it can cause condensation. For best flavor, use within 2-3 weeks of opening. We recommend grinding just before brewing."
+                },
+                {
+                    question: "Do you offer a subscription service?",
+                    answer: "Yes! Join our Coffee Club for automatic monthly deliveries at a discounted price. Members save $3 per bag and earn points with every purchase. Cancel or modify your subscription anytime."
+                }
+            ],
+            
+            variants: [],
+            
+            certifications: [
+                {
+                    name: "Fair Trade",
+                    issuer: "Fair Trade International",
+                    rating: "Certified",
+                    id: "FT-COFFEE-2024-789"
+                },
+                {
+                    name: "Rainforest Alliance",
+                    issuer: "Rainforest Alliance",
+                    rating: "Certified",
+                    id: "RA-2024-COFFEE-456"
+                }
+            ],
+            
+            shippingConditions: [
+                {
+                    country: "US",
+                    cost: "0",
+                    currency: "USD",
+                    minOrder: "0",
+                    maxOrder: "",
+                    doesNotShip: false,
+                    description: "Free shipping on all coffee orders"
+                }
+            ]
+        };
+    }
+    
+    _getBookSample() {
+        return {
+            productName: "The Complete Guide to Web Development | 2024 Edition",
+            description: "Master HTML, CSS, JavaScript, React, and Node.js with this comprehensive 800-page guide. Includes real-world projects and code examples. Perfect for beginners to advanced developers.",
+            metaKeywords: "web development, programming book, learn javascript, coding guide, react tutorial",
+            canonicalUrl: "https://yourstore.com/products/web-development-guide",
+            robotsContent: "index, follow",
+            
+            sku: "BOOK-WEB-2024",
+            mpn: "WEB-DEV-GUIDE-2024",
+            isbn: "978-0123456789",
+            brandName: "TechPress Publishing",
+            
+            imageUrls: [
+                "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200",
+                "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=1200"
+            ],
+            
+            price: "49.99",
+            priceCurrency: "USD",
+            priceValidUntil: "2026-12-31",
+            offerUrl: "https://yourstore.com/products/web-development-guide",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            strikethroughPrice: "69.99",
+            
+            isProductGroup: false,
+            
+            shippingCost: "4.99",
+            shippingCurrency: "USD",
+            shippingDestination: "US",
+            handlingTimeMin: "1",
+            handlingTimeMax: "2",
+            deliveryTimeMin: "3",
+            deliveryTimeMax: "7",
+            
+            returnDays: "30",
+            returnCountry: "US",
+            returnMethod: "https://schema.org/ReturnByMail",
+            returnFees: "https://schema.org/FreeReturn",
+            
+            aggregateRatingValue: "4.7",
+            reviewCount: "523",
+            
+            ogTitle: "The Complete Guide to Web Development - 2024 Edition",
+            ogDescription: "Master modern web development. 800 pages of tutorials, projects & code examples.",
+            ogImage: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=1200",
+            
+            reviews: [
+                {
+                    author: "Alex Developer",
+                    rating: "5",
+                    title: "Best programming book I've read",
+                    text: "This book is incredibly comprehensive yet easy to follow. The examples are practical and the explanations are clear. I went from knowing nothing about web development to building my own projects in 3 months!",
+                    date: "2026-02-15",
+                    pros: "Clear explanations, Practical examples, Comprehensive coverage, Well-organized",
+                    cons: "Heavy to carry around"
+                },
+                {
+                    author: "Jennifer Code",
+                    rating: "5",
+                    title: "Perfect for beginners",
+                    text: "I've tried many programming books and this is by far the best for beginners. It doesn't assume any prior knowledge and builds concepts progressively. Highly recommended!",
+                    date: "2026-02-10",
+                    pros: "Beginner-friendly, Step-by-step approach, Good exercises, Updated for 2024",
+                    cons: "None"
+                },
+                {
+                    author: "Mark Backend",
+                    rating: "4",
+                    title: "Great reference guide",
+                    text: "Even as an experienced developer, I find myself referencing this book often. The Node.js and React sections are particularly well done. Worth having on your shelf!",
+                    date: "2026-02-05",
+                    pros: "Comprehensive, Good reference, Modern technologies, Quality binding",
+                    cons: "Could use more advanced topics"
+                }
+            ],
+            
+            faqs: [
+                {
+                    question: "Is this book suitable for complete beginners?",
+                    answer: "Absolutely! The book starts with the basics of HTML and CSS, assuming no prior programming knowledge. It then progressively builds your skills through JavaScript, React, and Node.js."
+                },
+                {
+                    question: "Does the book include code examples?",
+                    answer: "Yes! The book includes over 100 code examples and 15 complete projects. All code is available for download from our website, so you can follow along and modify the examples."
+                },
+                {
+                    question: "Is there a digital version available?",
+                    answer: "Yes! When you purchase the physical book, you also get free access to the PDF, EPUB, and MOBI versions. The download link will be sent to your email within 24 hours of purchase."
+                }
+            ],
+            
+            variants: [],
+            certifications: [],
+            shippingConditions: []
+        };
+    }
+    
+    _getFurnitureSample() {
+        return {
+            productName: "ErgoMax Pro Office Chair | Lumbar Support & Adjustable",
+            description: "Premium ergonomic office chair with adjustable lumbar support, breathable mesh back, and 4D armrests. Supports up to 300lbs. Free white-glove delivery and assembly!",
+            metaKeywords: "ergonomic chair, office chair, lumbar support, adjustable chair, mesh chair",
+            canonicalUrl: "https://yourstore.com/products/ergomax-pro-chair",
+            robotsContent: "index, follow",
+            
+            sku: "EMP-2024-BLK",
+            mpn: "ERGO-CHAIR-PRO-001",
+            gtin: "0056789012345",
+            brandName: "ErgoMax",
+            
+            imageUrls: [
+                "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1200",
+                "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=1200",
+                "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200"
+            ],
+            
+            price: "399.99",
+            priceCurrency: "USD",
+            priceValidUntil: "2026-12-31",
+            offerUrl: "https://yourstore.com/products/ergomax-pro-chair",
+            availability: "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+            strikethroughPrice: "599.99",
+            
+            memberPrice: "359.99",
+            memberProgramName: "ErgoMax VIP",
+            memberProgramUrl: "https://yourstore.com/vip",
+            memberTierName: "Premium",
+            memberPointsEarned: "400",
+            
+            isProductGroup: true,
+            productGroupID: "ERGOMAX-PRO-2024",
+            variesByColor: true,
+            variesByMaterial: true,
+            
+            shippingCost: "0",
+            shippingCurrency: "USD",
+            shippingDestination: "US",
+            handlingTimeMin: "3",
+            handlingTimeMax: "5",
+            deliveryTimeMin: "7",
+            deliveryTimeMax: "14",
+            
+            returnDays: "90",
+            returnCountry: "US",
+            returnMethod: "https://schema.org/ReturnByMail",
+            returnFees: "https://schema.org/FreeReturn",
+            customerRemorseReturnFees: "https://schema.org/FreeReturn",
+            itemDefectReturnFees: "https://schema.org/FreeReturn",
+            returnLabelSource: "https://schema.org/ReturnLabelCustomerResponsibility",
+            
+            aggregateRatingValue: "4.8",
+            reviewCount: "1834",
+            
+            certificationName: "BIFMA",
+            certificationIssuer: "Business and Institutional Furniture Manufacturers Association",
+            certificationRating: "Level 3 Certified",
+            certificationId: "BIFMA-2024-CHAIR-999",
+            
+            model3dUrl: "https://example.com/models/ergomax-chair.gltf",
+            
+            ogTitle: "ErgoMax Pro Office Chair - Premium Ergonomic Design",
+            ogDescription: "All-day comfort with adjustable lumbar support. Free delivery & assembly. Save $200!",
+            ogImage: "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1200",
+            
+            reviews: [
+                {
+                    author: "David Office",
+                    rating: "5",
+                    title: "Best chair investment ever",
+                    text: "After years of back pain from cheap office chairs, I finally invested in the ErgoMax Pro. Within a week, my back pain was gone. The lumbar support is adjustable and actually works!",
+                    date: "2026-02-16",
+                    pros: "Excellent lumbar support, Very comfortable, Easy assembly, Sturdy construction",
+                    cons: "Expensive but worth it"
+                },
+                {
+                    author: "Lisa Remote",
+                    rating: "5",
+                    title: "Perfect for working from home",
+                    text: "I sit in this chair 8-10 hours a day working remotely. It's incredibly comfortable and all the adjustments let me dial in the perfect position. The mesh back keeps me cool too!",
+                    date: "2026-02-12",
+                    pros: "All-day comfort, Breathable mesh, Highly adjustable, Free delivery",
+                    cons: "Armrests could be softer"
+                },
+                {
+                    author: "Robert Gamer",
+                    rating: "5",
+                    title: "Great for gaming too",
+                    text: "I bought this for my home office but it's become my gaming chair too. Way more comfortable than gaming chairs and better for your posture. The 300lb weight capacity is perfect.",
+                    date: "2026-02-08",
+                    pros: "Comfortable for long sessions, Good for posture, Sturdy, Quiet casters",
+                    cons: "No RGB lights (joking!)"
+                },
+                {
+                    author: "Susan Designer",
+                    rating: "4",
+                    title: "Professional quality",
+                    text: "This is exactly what you'd find in a professional office. The build quality is excellent and it looks great in my home office. Assembly was straightforward with clear instructions.",
+                    date: "2026-02-03",
+                    pros: "Professional quality, Looks great, Easy assembly, Durable",
+                    cons: "Pricey, Takes up space"
+                }
+            ],
+            
+            faqs: [
+                {
+                    question: "What's the weight capacity?",
+                    answer: "The ErgoMax Pro is designed to support up to 300 pounds (136 kg). The chair has been rigorously tested to meet and exceed BIFMA standards for safety and durability."
+                },
+                {
+                    question: "Is assembly required?",
+                    answer: "Minimal assembly is required. The chair comes mostly pre-assembled - you just need to attach the base and armrests (takes about 10 minutes). For an additional fee, we offer white-glove delivery with professional assembly."
+                },
+                {
+                    question: "What are the dimensions?",
+                    answer: "Seat width: 20.5 inches, Seat depth: 20 inches, Back height: 26 inches, Overall height: 42-52 inches (adjustable), Base width: 27 inches. The chair fits comfortably under most standard desks."
+                },
+                {
+                    question: "What's your return policy?",
+                    answer: "We offer a 90-day trial period with free returns. If you're not completely satisfied, contact us for a return authorization. We'll arrange pickup at no cost to you and issue a full refund."
+                },
+                {
+                    question: "Does it come with a warranty?",
+                    answer: "Yes! The ErgoMax Pro comes with a 10-year warranty on the frame and mechanism, 3-year warranty on the gas lift, and 2-year warranty on the fabric and foam. We stand behind our products!"
+                }
+            ],
+            
+            variants: [
+                {
+                    name: "ErgoMax Pro - Black Mesh",
+                    sku: "EMP-2024-BLK-MESH",
+                    color: "Black",
+                    material: "Breathable Mesh",
+                    gtin: "0056789012345",
+                    url: "https://yourstore.com/products/ergomax?color=black&material=mesh",
+                    price: "399.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=1200"
+                },
+                {
+                    name: "ErgoMax Pro - Gray Mesh",
+                    sku: "EMP-2024-GRY-MESH",
+                    color: "Gray",
+                    material: "Breathable Mesh",
+                    gtin: "0056789012352",
+                    url: "https://yourstore.com/products/ergomax?color=gray&material=mesh",
+                    price: "399.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=1200"
+                },
+                {
+                    name: "ErgoMax Pro - Black Leather",
+                    sku: "EMP-2024-BLK-LTHR",
+                    color: "Black",
+                    material: "Premium Leather",
+                    gtin: "0056789012369",
+                    url: "https://yourstore.com/products/ergomax?color=black&material=leather",
+                    price: "499.99",
+                    availability: "https://schema.org/InStock",
+                    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200"
+                }
+            ],
+            
+            certifications: [
+                {
+                    name: "GREENGUARD Gold",
+                    issuer: "UL Environment",
+                    rating: "Certified",
+                    id: "GG-2024-CHAIR-777"
+                }
+            ],
+            
+            shippingConditions: [
+                {
+                    country: "US",
+                    cost: "0",
+                    currency: "USD",
+                    minOrder: "0",
+                    maxOrder: "",
+                    doesNotShip: false,
+                    description: "Free standard shipping (curbside delivery)"
+                },
+                {
+                    country: "US",
+                    cost: "99.99",
+                    currency: "USD",
+                    minOrder: "0",
+                    maxOrder: "",
+                    doesNotShip: false,
+                    description: "White-glove delivery with assembly"
+                }
+            ]
+        };
+    }
+    
+    _fillSampleData() {
+        const sampleData = this._getSampleDataByProductType();
+        
+        this._formData = sampleData;
+        this._reviews = sampleData.reviews || [];
+        this._faqs = sampleData.faqs || [];
+        this._variants = sampleData.variants || [];
+        this._certifications = sampleData.certifications || [];
+        this._shippingConditions = sampleData.shippingConditions || [];
+        
+        // Re-render the form with sample data
+        this._renderForm();
+        
+        this._showToast('success', '✨ Sample data loaded! Review the fields and click Save to test.');
+    }
+
+_showForm(product, seoData, isEdit) {
         console.log('🔷 Dashboard: Showing form for:', product.name);
         
         this._selectedProduct = product;
@@ -2675,30 +3649,7 @@ class ProductSEODashboard extends HTMLElement {
             { code: 'AUD', name: 'Australian Dollar' },
             { code: 'CAD', name: 'Canadian Dollar' },
             { code: 'JPY', name: 'Japanese Yen' },
-            { code: 'CNY', name: 'Chinese Yuan' },
-            { code: 'CHF', name: 'Swiss Franc' },
-            { code: 'SEK', name: 'Swedish Krona' },
-            { code: 'NZD', name: 'New Zealand Dollar' },
-            { code: 'MXN', name: 'Mexican Peso' },
-            { code: 'SGD', name: 'Singapore Dollar' },
-            { code: 'HKD', name: 'Hong Kong Dollar' },
-            { code: 'NOK', name: 'Norwegian Krone' },
-            { code: 'TRY', name: 'Turkish Lira' },
-            { code: 'RUB', name: 'Russian Ruble' },
-            { code: 'BRL', name: 'Brazilian Real' },
-            { code: 'ZAR', name: 'South African Rand' },
-            { code: 'DKK', name: 'Danish Krone' },
-            { code: 'PLN', name: 'Polish Zloty' },
-            { code: 'THB', name: 'Thai Baht' },
-            { code: 'MYR', name: 'Malaysian Ringgit' },
-            { code: 'IDR', name: 'Indonesian Rupiah' },
-            { code: 'HUF', name: 'Hungarian Forint' },
-            { code: 'CZK', name: 'Czech Koruna' },
-            { code: 'ILS', name: 'Israeli Shekel' },
-            { code: 'CLP', name: 'Chilean Peso' },
-            { code: 'PHP', name: 'Philippine Peso' },
-            { code: 'AED', name: 'UAE Dirham' },
-            { code: 'SAR', name: 'Saudi Riyal' }
+            { code: 'CNY', name: 'Chinese Yuan' }
         ];
         
         return currencies.map(c => `<option value="${c.code}">${c.code} - ${c.name}</option>`).join('');
@@ -2715,23 +3666,7 @@ class ProductSEODashboard extends HTMLElement {
             { code: 'FR', name: 'France' },
             { code: 'IT', name: 'Italy' },
             { code: 'ES', name: 'Spain' },
-            { code: 'NL', name: 'Netherlands' },
-            { code: 'BE', name: 'Belgium' },
-            { code: 'CH', name: 'Switzerland' },
-            { code: 'AT', name: 'Austria' },
-            { code: 'SE', name: 'Sweden' },
-            { code: 'NO', name: 'Norway' },
-            { code: 'DK', name: 'Denmark' },
-            { code: 'FI', name: 'Finland' },
-            { code: 'IE', name: 'Ireland' },
-            { code: 'NZ', name: 'New Zealand' },
-            { code: 'SG', name: 'Singapore' },
-            { code: 'HK', name: 'Hong Kong' },
-            { code: 'JP', name: 'Japan' },
-            { code: 'CN', name: 'China' },
-            { code: 'IN', name: 'India' },
-            { code: 'BR', name: 'Brazil' },
-            { code: 'MX', name: 'Mexico' }
+            { code: 'IN', name: 'India' }
         ];
         
         return countries.map(c => `<option value="${c.code}">${c.name}</option>`).join('');
@@ -2739,4 +3674,4 @@ class ProductSEODashboard extends HTMLElement {
 }
 
 customElements.define('product-seo-dashboard', ProductSEODashboard);
-console.log('🔷 Dashboard: ✅ Custom element registered with ALL Google-supported fields + GTIN validation');
+console.log('🔷 Dashboard: ✅ Custom element registered with sample data & Google Rich Results testing');
